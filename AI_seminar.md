@@ -2,13 +2,18 @@
 
 ## Recap: NLP 모델 발전의 큰 줄기
 
+![image3.png](AI_seminar_images_png/image3.png)
+![image6.png](AI_seminar_images_png/image6.png)
+
 자연어처리(NLP) 모델의 역사는 “문장을 어떻게 표현할 것인가”라는 질문을 중심으로 발전해왔다. 초창기에는 단어를 벡터로 바꾸는 표현 학습이 중요했고, 이후에는 문맥을 반영하는 표현으로, 더 나아가 문장 전체의 관계를 직접 학습하는 구조로 확장되었다.
 
 이 발표는 그 흐름을 따라가며, 특히 **Transformer encoder가 왜 강력한지**를 구조적으로 정리하고, 그 아이디어가 BERT 같은 언어 모델 및 ViT/MAE 같은 비전 모델로 어떻게 이어지는지까지 연결한다.
 
 ---
-
 ## Seq2Seq: “문장 → 문장”을 만드는 첫 표준 형태
+
+![image7.png](AI_seminar_images_png/image7.png)
+![image8.png](AI_seminar_images_png/image8.png)
 
 2014년 무렵, 기계번역 같은 “입력 시퀀스를 다른 길이의 출력 시퀀스로 변환”하는 문제를 풀기 위해 **Seq2Seq(Encoder–Decoder)** 구조가 제안되었다[1]. 기본 형태는 다음과 같다.
 
@@ -23,6 +28,9 @@
 
 ## Attention: “필요한 곳을 본다”는 아이디어
 
+![image10.png](AI_seminar_images_png/image10.png)
+![image11.png](AI_seminar_images_png/image11.png)
+
 이 문제를 해결하기 위해 **Attention 메커니즘**이 도입된다[2],[3]. 핵심은 “문장 전체를 하나로 압축”하는 대신, 디코딩 시점마다 입력의 여러 위치(토큰) 중 **어디를 얼마나 볼지** 가중치를 학습하는 것이다.
 
 - **Bahdanau attention**: 번역 과정에서 입력-출력 정렬(alignment)을 학습하며, 디코더 상태와 인코더 상태의 조합으로 주의(attention)를 계산[2]
@@ -34,15 +42,23 @@
 
 ## Transformer: “RNN 없이 Attention만으로” 문장을 다룬다
 
+![image13.png](AI_seminar_images_png/image13.png)
+![image14.png](AI_seminar_images_png/image14.png)
+
 Transformer는 문장을 처리할 때 RNN/LSTM처럼 순차 처리를 강제하지 않고, **Attention을 중심으로** 입력 토큰들 사이의 관계를 직접 계산한다[4]. 구조는 Encoder–Decoder를 유지하지만, 이 발표의 핵심은 특히 **Transformer encoder**의 동작 원리다.
 
 Transformer 전체 아키텍처를 시각적으로 이해하는 데는 아래 자료가 도움이 된다.
 
-- http://jalammar.github.io/illustrated-transformer/
+- [http://jalammar.github.io/illustrated-transformer/](http://jalammar.github.io/illustrated-transformer/)
 
 ---
 
 ## Transformer Encoder의 큰 그림
+
+![image15.png](AI_seminar_images_png/image15.png)
+![image16.png](AI_seminar_images_png/image16.png)
+![image17.png](AI_seminar_images_png/image17.png)
+![image18.png](AI_seminar_images_png/image18.png)
 
 Transformer encoder는 여러 개의 동일한 블록을 층층이 쌓는다. 각 층은 구조는 같지만 가중치는 공유하지 않는다. 각 encoder 층은 크게 두 덩어리로 이해하면 된다.
 
@@ -55,6 +71,8 @@ Transformer encoder는 여러 개의 동일한 블록을 층층이 쌓는다. �
 
 ## Self-Attention 직관: “it”이 무엇을 가리키는지 찾기
 
+![image19.png](AI_seminar_images_png/image19.png)
+
 Self-attention은 문장 안의 각 단어가 다른 단어들을 참고해 자신의 표현을 업데이트하도록 한다. 예를 들어 아래 문장에서,
 
 > “The animal didn’t cross the street because it was too tired”
@@ -64,6 +82,14 @@ Self-attention은 문장 안의 각 단어가 다른 단어들을 참고해 자�
 ---
 
 ## Self-Attention의 핵심 구성요소: Q, K, V
+
+![image20.png](AI_seminar_images_png/image20.png)
+![image21.png](AI_seminar_images_png/image21.png)
+![image22.png](AI_seminar_images_png/image22.png)
+![image23.png](AI_seminar_images_png/image23.png)
+![image24.png](AI_seminar_images_png/image24.png)
+![image25.png](AI_seminar_images_png/image25.png)
+![image26.png](AI_seminar_images_png/image26.png)
 
 Self-attention은 각 토큰 벡터로부터 세 가지 벡터를 만든다.
 
@@ -77,7 +103,7 @@ Self-attention 계산 흐름은 보통 다음과 같은 단계로 요약된다.
 
 1. 각 토큰으로부터 Q, K, V를 만든다
 2. Query와 Key의 내적(dot product)으로 유사도 점수를 만든다
-3. 스케일링(보통 \(\\sqrt{d_k}\\)로 나눔)하여 학습 안정성을 높인다
+3. 스케일링(보통 sqrt{d_k})로 나눔)하여 학습 안정성을 높인다
 4. Softmax로 가중치(주의 분포)를 만든다
 5. 그 가중치로 Value를 가중합하여 새로운 표현을 만든다
 
@@ -86,6 +112,12 @@ Self-attention 계산 흐름은 보통 다음과 같은 단계로 요약된다.
 ---
 
 ## Multi-Head Attention: “여러 관점으로 동시에 본다”
+
+![image27.png](AI_seminar_images_png/image27.png)
+![image28.png](AI_seminar_images_png/image28.png)
+![image29.png](AI_seminar_images_png/image29.png)
+![image30.png](AI_seminar_images_png/image30.png)
+![image31.png](AI_seminar_images_png/image31.png)
 
 Single-head attention만 쓰면 한 가지 관계에 과도하게 집중하거나, 특정 토큰 자기 자신에만 크게 반응하는 문제가 생길 수 있다. Multi-head attention은 attention을 여러 개(head)로 나눠서,
 
@@ -100,6 +132,10 @@ Single-head attention만 쓰면 한 가지 관계에 과도하게 집중하거�
 
 ## Word2Vec: 단어를 벡터로 표현하지만 “문맥”은 모른다
 
+![image32.png](AI_seminar_images_png/image32.png)
+![image33.png](AI_seminar_images_png/image33.png)
+![image34.png](AI_seminar_images_png/image34.png)
+
 Word2Vec은 “비슷한 위치에서 등장하는 단어는 비슷한 의미”라는 분포 가설을 바탕으로, 단어를 고정된 벡터로 학습한다[5].
 
 - **CBOW**: 주변 단어들로 중심 단어를 맞추는 방식
@@ -110,6 +146,11 @@ Word2Vec은 “비슷한 위치에서 등장하는 단어는 비슷한 의미”
 ---
 
 ## ELMo: 문맥을 반영한 단어 임베딩
+
+![image35.png](AI_seminar_images_png/image35.png)
+![image36.png](AI_seminar_images_png/image36.png)
+![image37.png](AI_seminar_images_png/image37.png)
+![image38.png](AI_seminar_images_png/image38.png)
 
 그래서 등장한 것이 **문맥 기반(contextual) 임베딩**이다. ELMo는 “단어 임베딩을 고정 테이블로 두는 것” 대신, **문장 전체를 보고** 각 단어의 임베딩을 만들어 낸다.
 
@@ -123,6 +164,14 @@ Word2Vec은 “비슷한 위치에서 등장하는 단어는 비슷한 의미”
 ---
 
 ## BERT: Transformer Encoder를 사전학습의 중심으로
+
+![image39.png](AI_seminar_images_png/image39.png)
+![image40.png](AI_seminar_images_png/image40.png)
+![image41.png](AI_seminar_images_png/image41.png)
+![image42.png](AI_seminar_images_png/image42.png)
+![image43.png](AI_seminar_images_png/image43.png)
+![image44.png](AI_seminar_images_png/image44.png)
+![image45.png](AI_seminar_images_png/image45.png)
 
 BERT는 “단어/문장/언어를 어떻게 표현해야 downstream task에서 강력할까?”라는 질문에 대해, **Transformer encoder**를 기반으로 언어 표현(language representation)을 학습한다[7]. 그리고 fine-tuning으로 다양한 NLP task(분류, 질의응답 등)에 적용할 수 있게 설계되었다.
 
@@ -152,6 +201,8 @@ BERT의 핵심 사전학습 목표는 두 가지로 요약된다.
 
 ## ViT: Transformer encoder가 “언어 밖”으로 확장되다
 
+![image46.png](AI_seminar_images_png/image46.png)
+
 Transformer encoder의 아이디어는 NLP에서 강력함이 증명된 뒤, 비전으로 확장된다. ViT(Vision Transformer)는 이미지를 패치(patch) 단위의 토큰으로 쪼개어, 문장처럼 토큰 시퀀스로 보고 transformer encoder에 넣는다[8].
 
 공통점:
@@ -167,6 +218,14 @@ Transformer encoder의 아이디어는 NLP에서 강력함이 증명된 뒤, 비
 ---
 
 ## MAE: “BERT의 마스킹 아이디어”를 비전에 맞게 재해석
+
+![image47.png](AI_seminar_images_png/image47.png)
+![image48.png](AI_seminar_images_png/image48.png)
+![image49.png](AI_seminar_images_png/image49.png)
+![image50.png](AI_seminar_images_png/image50.png)
+![image51.png](AI_seminar_images_png/image51.png)
+![image52.png](AI_seminar_images_png/image52.png)
+![image53.png](AI_seminar_images_png/image53.png)
 
 MAE(Masked Autoencoders)는 “언어에서 성공한 마스킹 사전학습을 이미지에도 적용할 수 있을까?”라는 질문에서 출발한다[9]. 다만 이미지와 언어는 신호 특성이 크게 다르다.
 
@@ -189,6 +248,8 @@ MAE 관점에서 decoder는 “잠재표현(latent representation)을 다시 입
 
 ## Conclusion
 
+![image54.png](AI_seminar_images_png/image54.png)
+
 오늘 다룬 흐름은 다음처럼 정리된다.
 
 - **Word2Vec**: 단어를 벡터로 (하지만 문맥 반영은 약함)
@@ -197,19 +258,9 @@ MAE 관점에서 decoder는 “잠재표현(latent representation)을 다시 입
 - **BERT**: Transformer encoder + 마스킹 기반 사전학습으로 NLP 전반을 재구성
 - **ViT/MAE**: encoder 중심 설계가 비전으로도 확장되며, 마스킹 아이디어가 영역 특성에 맞게 변형
 
-슬라이드의 요약 표기를 그대로 두면 아래와 같다.
-
 - ELMo: Embeddings from Language Models
 - BERT: Bidirectional Encoder Repersentations from Transformer
 - ERNIE: Enhanced Language Representation with Informative Entities
-
----
-
-## Next week
-
-- About ClS token
-- About positional encodings in images
-- Papers: Transformer in person re-identification (How to의 사고확장을 위해)
 
 ---
 
@@ -223,3 +274,4 @@ MAE 관점에서 decoder는 “잠재표현(latent representation)을 다시 입
 - (ELMo) M. Peters et al., "Deep contextualized word representations. arXiv 2018," arXiv preprint arXiv:1802.05365, vol. 12, 1802.
 - J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, "Bert: Pre-training of deep bidirectional transformers for language understanding," arXiv preprint arXiv:1810.04805, 2018.
 - K. He, X. Chen, S. Xie, Y. Li, P. Dollár, and R. Girshick, "Masked Autoencoders Are Scalable Vision Learners," arXiv preprint arXiv:2111.06377, 2
+
