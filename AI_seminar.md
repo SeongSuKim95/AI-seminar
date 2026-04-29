@@ -7,7 +7,40 @@
 
 자연어처리(NLP) 모델의 역사는 “문장을 어떻게 표현할 것인가”라는 질문을 중심으로 발전해왔다. 초창기에는 단어를 벡터로 바꾸는 표현 학습이 중요했고, 이후에는 문맥을 반영하는 표현으로, 더 나아가 문장 전체의 관계를 직접 학습하는 구조로 확장되었다.
 
-이 발표는 그 흐름을 따라가며, 특히 **Transformer encoder가 왜 강력한지**를 구조적으로 정리하고, 그 아이디어가 BERT 같은 언어 모델 및 ViT/MAE 같은 비전 모델로 어떻게 이어지는지까지 연결한다.
+특히 **Transformer encoder가 왜 강력한지**를 구조적으로 정리하고, 그 아이디어가 BERT 같은 언어 모델 및 ViT/MAE 같은 비전 모델로 어떻게 이어지는지까지 연결한다.
+
+---
+
+## Word2Vec: 단어를 벡터로 표현하지만 “문맥”은 모른다
+
+![image32.png](AI_seminar_images_png/image32.png)
+![image33.png](AI_seminar_images_png/image33.png)
+![image34.png](AI_seminar_images_png/image34.png)
+
+Word2Vec은 “비슷한 위치에서 등장하는 단어는 비슷한 의미”라는 분포 가설을 바탕으로, 단어를 고정된 벡터로 학습한다[5].
+
+- **CBOW**: 주변 단어들로 중심 단어를 맞추는 방식
+- 슬라이딩 윈도우로 주변 문맥을 샘플링하며 학습
+
+다만 Word2Vec의 임베딩은 단어 하나당 “하나의 벡터”이기 때문에, 같은 단어라도 문맥에 따라 의미가 달라지는 현상(다의성)을 잘 반영하지 못한다. 예를 들어 “bank”는 문맥에 따라 은행/강둑 의미가 달라지지만, Word2Vec은 이를 분리하기 어렵다.
+
+---
+
+## ELMo: 문맥을 반영한 단어 임베딩
+
+![image35.png](AI_seminar_images_png/image35.png)
+![image36.png](AI_seminar_images_png/image36.png)
+![image37.png](AI_seminar_images_png/image37.png)
+![image38.png](AI_seminar_images_png/image38.png)
+
+그래서 등장한 것이 **문맥 기반(contextual) 임베딩**이다. ELMo는 “단어 임베딩을 고정 테이블로 두는 것” 대신, **문장 전체를 보고** 각 단어의 임베딩을 만들어 낸다.
+
+핵심 아이디어는 간단하다.
+
+- 같은 “stick”이라도 문장 속 역할/의미에 따라 다른 표현을 가져야 한다
+- 모델이 문맥을 통해 그 차이를 학습하도록 한다
+
+이 흐름은 곧 Transformer encoder 기반의 대규모 사전학습(pretraining)으로 이어진다.
 
 ---
 ## Seq2Seq: “문장 → 문장”을 만드는 첫 표준 형태
@@ -90,7 +123,6 @@ Self-attention은 문장 안의 각 단어가 다른 단어들을 참고해 자�
 ![image24.png](AI_seminar_images_png/image24.png)
 ![image25.png](AI_seminar_images_png/image25.png)
 ![image26.png](AI_seminar_images_png/image26.png)
-
 Self-attention은 각 토큰 벡터로부터 세 가지 벡터를 만든다.
 
 - **Query(Q)**: 내가 무엇을 찾고 싶은지
@@ -108,6 +140,7 @@ Self-attention 계산 흐름은 보통 다음과 같은 단계로 요약된다.
 5. 그 가중치로 Value를 가중합하여 새로운 표현을 만든다
 
 슬라이드의 행렬 그림은 이 과정을 “벡터 버전 → 행렬 버전”으로 확장해 보여주며, 핵심 메시지는 **병렬로 한 번에 계산 가능**하다는 점이다.
+![image55.png](AI_seminar_images_png/image55.png)
 
 ---
 
@@ -127,39 +160,6 @@ Single-head attention만 쓰면 한 가지 관계에 과도하게 집중하거�
 동시에 학습하도록 한다.
 
 각 head는 각자 Q/K/V 투영을 가진 채로 attention 결과(Z)를 만들고, 여러 head의 결과를 이어 붙인 뒤(concatenate) 다시 한 번 선형 변환으로 “다음 층이 받을 하나의 행렬”로 압축한다. 슬라이드의 ‘여러 head → 여러 Z → 하나로 condense’ 그림은 이 과정을 요약한다.
-
----
-
-## Word2Vec: 단어를 벡터로 표현하지만 “문맥”은 모른다
-
-![image32.png](AI_seminar_images_png/image32.png)
-![image33.png](AI_seminar_images_png/image33.png)
-![image34.png](AI_seminar_images_png/image34.png)
-
-Word2Vec은 “비슷한 위치에서 등장하는 단어는 비슷한 의미”라는 분포 가설을 바탕으로, 단어를 고정된 벡터로 학습한다[5].
-
-- **CBOW**: 주변 단어들로 중심 단어를 맞추는 방식
-- 슬라이딩 윈도우로 주변 문맥을 샘플링하며 학습
-
-다만 Word2Vec의 임베딩은 단어 하나당 “하나의 벡터”이기 때문에, 같은 단어라도 문맥에 따라 의미가 달라지는 현상(다의성)을 잘 반영하지 못한다. 예를 들어 “bank”는 문맥에 따라 은행/강둑 의미가 달라지지만, Word2Vec은 이를 분리하기 어렵다.
-
----
-
-## ELMo: 문맥을 반영한 단어 임베딩
-
-![image35.png](AI_seminar_images_png/image35.png)
-![image36.png](AI_seminar_images_png/image36.png)
-![image37.png](AI_seminar_images_png/image37.png)
-![image38.png](AI_seminar_images_png/image38.png)
-
-그래서 등장한 것이 **문맥 기반(contextual) 임베딩**이다. ELMo는 “단어 임베딩을 고정 테이블로 두는 것” 대신, **문장 전체를 보고** 각 단어의 임베딩을 만들어 낸다.
-
-핵심 아이디어는 간단하다.
-
-- 같은 “stick”이라도 문장 속 역할/의미에 따라 다른 표현을 가져야 한다
-- 모델이 문맥을 통해 그 차이를 학습하도록 한다
-
-이 흐름은 곧 Transformer encoder 기반의 대규모 사전학습(pretraining)으로 이어진다.
 
 ---
 
@@ -201,8 +201,6 @@ BERT의 핵심 사전학습 목표는 두 가지로 요약된다.
 
 ## ViT: Transformer encoder가 “언어 밖”으로 확장되다
 
-![image46.png](AI_seminar_images_png/image46.png)
-
 Transformer encoder의 아이디어는 NLP에서 강력함이 증명된 뒤, 비전으로 확장된다. ViT(Vision Transformer)는 이미지를 패치(patch) 단위의 토큰으로 쪼개어, 문장처럼 토큰 시퀀스로 보고 transformer encoder에 넣는다[8].
 
 공통점:
@@ -220,8 +218,6 @@ Transformer encoder의 아이디어는 NLP에서 강력함이 증명된 뒤, 비
 ## MAE: “BERT의 마스킹 아이디어”를 비전에 맞게 재해석
 
 ![image47.png](AI_seminar_images_png/image47.png)
-![image48.png](AI_seminar_images_png/image48.png)
-![image49.png](AI_seminar_images_png/image49.png)
 ![image50.png](AI_seminar_images_png/image50.png)
 ![image51.png](AI_seminar_images_png/image51.png)
 ![image52.png](AI_seminar_images_png/image52.png)
@@ -242,15 +238,11 @@ MAE 관점에서 decoder는 “잠재표현(latent representation)을 다시 입
 - **Vision**: decoder가 픽셀을 복원하며, 출력은 인식(recognition) task 대비 상대적으로 저수준
 - **Language**: decoder가 의미가 풍부한 단어를 예측해야 하므로 더 고수준의 이해가 요구됨
 
-슬라이드의 Architecture/Result 파트는 이런 설계 차이가 실제로 어떤 성능/학습 효율로 이어지는지를 시각적으로 요약한다.
-
 ---
 
 ## Conclusion
 
 ![image54.png](AI_seminar_images_png/image54.png)
-
-오늘 다룬 흐름은 다음처럼 정리된다.
 
 - **Word2Vec**: 단어를 벡터로 (하지만 문맥 반영은 약함)
 - **ELMo**: 문맥 기반 임베딩으로 한 단계 확장
