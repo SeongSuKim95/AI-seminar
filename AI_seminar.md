@@ -13,7 +13,7 @@ NLP (Natural Language Processing)은 2가지 큰 연구 흐름속에 발전해�
 
 ## Part A. Word Embedding(표현) 발전 흐름
 
-### A1. BoW / TF-IDF: 희소한 표현의 시대
+### A1. BoW / TF-IDF
 
 **(Key papers / year)**: TF-IDF (1988)[10]
 
@@ -22,17 +22,18 @@ NLP (Natural Language Processing)은 2가지 큰 연구 흐름속에 발전해�
 - **Bag-of-Words(BoW)**: 단어 등장 빈도로 문서를 표현하지만, **단어 순서 정보가 사라진다**
 - **TF-IDF**: 자주 등장하지만 구분력이 낮은 단어는 낮추고, 문서를 구분해주는 단어는 강조하는 가중치 방식[10]
 
+![image62.png](./AI_seminar_images_png/image62.png)
+![image63.png](./AI_seminar_images_png/image63.png)
+
 하지만 이 방식은 “문맥”이나 “의미의 조합(구문/의존관계)”을 직접 표현하기 어렵다.
 
-#### 남은 문제 (왜 다음 단계가 필요했나)
-
 - **순서/구문 정보 손실**: BoW/TF-IDF는 단어 “주머니”라서 단어 순서가 사라진다.
-- **희소(sparse)·차원 폭발**: 어휘 크기만큼 차원이 커지고 대부분 0인 벡터가 된다.
+- **희소값의 문제, 차원의 증가**: 어휘 크기만큼 차원이 커지고 대부분 0인 벡터가 된다.
 - **의미 유사도 표현 한계**: 의미적으로 가까운 단어를 “연속 공간에서 가깝게” 두는 표현이 아니다.
 
 ---
 
-### A2. Word2Vec: 단어를 dense 벡터로 (하지만 문맥은 고정)
+### A2. Word2Vec: 단어를 dense 벡터로
 
 **(Key papers / year)**: Word2Vec (2013)[5]
 
@@ -89,9 +90,14 @@ ELMo는 강력했지만, 보통 “특징(feature)로 추출해서” 기존 모
 “문맥”을 다루려면 결국 **순서(sequence)** 정보를 모델링해야 한다. RNN/LSTM은 토큰을 순차적으로 처리하며 hidden state로 정보를 누적해 순서를 모델링하고, 언어모델은 다음 토큰 예측 \(p(w_t \mid w_{<t})\)로 이를 학습한다[13].
 
 - **CNN for sentence**: n-gram처럼 **국소(local) 패턴**을 잘 잡아내는 문장 분류 모델[11]
+
+![image72.png](./AI_seminar_images_png/image72.png)
+
 - **RNN / LSTM 언어모델**: 장기 의존을 완화하기 위한 LSTM 게이트 구조[12], RNN LM의 다음 단어 예측 학습[13]
 
-#### RNN/LSTM 언어모델에서 “단어”는 어떻게 입력/학습되나?
+![image60.png](./AI_seminar_images_png/image60.png)
+![image61.png](./AI_seminar_images_png/image61.png)
+
 
 RNN/LSTM 언어모델은 Word2Vec처럼 “임베딩을 먼저 따로 학습”해 쓰기보다, 언어모델 학습 과정에서 단어 표현(입력 임베딩)을 **end-to-end로 함께 학습**하는 경우가 많다.
 
@@ -125,7 +131,7 @@ RNN/LSTM 언어모델은 Word2Vec처럼 “임베딩을 먼저 따로 학습”�
 
 고정 길이 요약의 한계를 넘기 위해 **Attention 메커니즘**이 도입된다[2],[3]. 디코딩 시점마다 입력의 여러 위치 중 어디를 얼마나 볼지 학습한다.
 
-### Attention vs Self-Attention (명확히 구분)
+### Attention vs Self-Attention
 
 - **(Encoder–Decoder) Attention**: 출력 토큰 생성 시 입력을 참고하는 **cross-attention**[2],[3]
 - **Self-Attention**: 시퀀스 내부 토큰 간 관계를 계산해 표현을 업데이트(Transformer 핵심)[4]
@@ -134,9 +140,12 @@ RNN/LSTM 언어모델은 Word2Vec처럼 “임베딩을 먼저 따로 학습”�
 
 ### B4. Transformer: RNN 없이 self-attention만으로
 
+https://jalammar.github.io/illustrated-transformer/
+
+![image64.png](./AI_seminar_images_png/image64.png)
+
 **(Key papers / year)**: Transformer (2017)[4]
 
-![image14.png](./AI_seminar_images_png/image14.png)
 ![image15.png](./AI_seminar_images_png/image15.png)
 
 Transformer는 순차 처리를 강제하지 않고 self-attention으로 토큰 간 관계를 직접 계산한다[4].
@@ -151,12 +160,10 @@ Transformer encoder 내부(큰 그림, QKV, multi-head)는 아래 섹션에서 �
 
 ---
 
-#### Transformer Encoder의 큰 그림
+#### Transformer Encoder의 원리
 
 ![image16.png](./AI_seminar_images_png/image16.png)
 ![image17.png](./AI_seminar_images_png/image17.png)
-![image18.png](./AI_seminar_images_png/image18.png)
-![image19.png](./AI_seminar_images_png/image19.png)
 
 Transformer encoder는 여러 개의 동일한 블록을 층층이 쌓는다. 각 encoder 층은 크게 두 덩어리로 이해하면 된다.
 
@@ -165,30 +172,23 @@ Transformer encoder는 여러 개의 동일한 블록을 층층이 쌓는다. �
 
 입력은 토큰 임베딩이며, 구현에서는 positional encoding을 더하는 것이 일반적이다[4].
 
----
-
 #### Self-Attention 직관: “it”이 무엇을 가리키는지 찾기
 
 ![image20.png](./AI_seminar_images_png/image20.png)
 
-Self-attention은 문장 안의 각 단어가 다른 단어들을 참고해 자신의 표현을 업데이트하도록 한다.
-
----
-
-#### Self-Attention의 핵심 구성요소: Q, K, V
+- **Self-attention은 문장 안의 각 단어가 다른 단어들을 참고해 자신의 표현을 업데이트**하도록 한다.
+- **Self-Attention의 핵심 구성요소**는 Query, Key, Value 이다.
 
 ![image21.png](./AI_seminar_images_png/image21.png)
 ![image22.png](./AI_seminar_images_png/image22.png)
 ![image23.png](./AI_seminar_images_png/image23.png)
 ![image24.png](./AI_seminar_images_png/image24.png)
-![image25.png](./AI_seminar_images_png/image25.png)
 ![image26.png](./AI_seminar_images_png/image26.png)
 ![image27.png](./AI_seminar_images_png/image27.png)
 
 Self-attention은 각 토큰 벡터로부터 Query/Key/Value를 만들고, 유사도 기반 가중합으로 새로운 표현을 만든다[4].
 
 ![image28.png](./AI_seminar_images_png/image28.png)
-
 ---
 
 #### Multi-Head Attention: “여러 관점으로 동시에 본다”
@@ -197,7 +197,6 @@ Self-attention은 각 토큰 벡터로부터 Query/Key/Value를 만들고, 유�
 ![image30.png](./AI_seminar_images_png/image30.png)
 ![image31.png](./AI_seminar_images_png/image31.png)
 ![image32.png](./AI_seminar_images_png/image32.png)
-![image33.png](./AI_seminar_images_png/image33.png)
 
 Multi-head attention은 서로 다른 하위 표현 공간에서 서로 다른 관계 패턴을 동시에 학습하도록 한다[4].
 
@@ -205,13 +204,12 @@ Multi-head attention은 서로 다른 하위 표현 공간에서 서로 다른 �
 
 ### B5. 대규모 사전학습(Pretraining)과 전이(Fine-tuning): BERT vs GPT
 
-#### BERT: Transformer Encoder를 사전학습의 중심으로
+#### BERT: Transformer Encoder를 사전학습의 중심으로 downstream TASK를 해결결
+
+https://jalammar.github.io/illustrated-bert/
 
 **(Key papers / year)**: BERT (2018)[7]
 
-![image34.png](./AI_seminar_images_png/image34.png)
-![image35.png](./AI_seminar_images_png/image35.png)
-![image36.png](./AI_seminar_images_png/image36.png)
 ![image37.png](./AI_seminar_images_png/image37.png)
 ![image38.png](./AI_seminar_images_png/image38.png)
 ![image39.png](./AI_seminar_images_png/image39.png)
@@ -221,28 +219,36 @@ BERT는 Transformer encoder를 기반으로 언어 표현을 학습하고, fine-
 
 #### GPT 계열: Transformer Decoder로 “생성”을 한다
 
-**(Key papers / year)**: GPT-1 (2018)[14] · GPT-3 (2020)[15]
+https://jalammar.github.io/illustrated-gpt2/
+
+**(Key papers / year)**: GPT-1 (2018)[14] · GPT-3 (2020)[15] 
 
 - **Encoder 중심**: BERT처럼 bidirectional 이해[7]
 - **Decoder-only 중심**: GPT처럼 causal 자기회귀 생성[14]
 
 ---
 
-### B6. Transformer의 아이디어가 Vision으로 확장되며 비전의 병목을 풀기 시작하다
+### B6. Transformer의 아이디어가 Vision으로 확장되며 비전의 병목을 풀기 시작하다.
 
+기존 Vision Task의 한계
 
 - **전이/일반화 한계**: 한 태스크/데이터셋에서 잘 되던 표현이 다른 태스크로 바로 잘 옮겨가지 않았다.
 - **전역 관계 모델링의 비효율**: 이미지 전체의 장거리 관계를 효율적으로 모델링하기 어렵거나, 설계(커널/피라미드 등)에 강한 귀납 편향이 필요했다.
 
 이런 문제를 배경으로 “패치 토큰 + self-attention + 대규모 사전학습/자기지도”로 이어지는 ViT 계열 흐름이 본격화된다.
 
-#### ViT
+#### Vision Transformer(ViT)
+
+https://medium.com/analytics-vidhya/illustrated-vision-transformers-165f4d0c3dd1
 
 **(Key papers / year)**: ViT (2021)[8]
 
+![image70.png](./AI_seminar_images_png/image70.png)
+![gif1.png](./AI_seminar_images_png/gif1.gif)
+
 Transformer encoder가 비전으로 확장되어, 이미지를 패치 토큰 시퀀스로 보고 encoder에 넣는다[8].
 
-#### MAE
+#### Masked Auto Encoder (MAE)
 
 **(Key papers / year)**: MAE (2022)[9]
 
@@ -252,25 +258,27 @@ Transformer encoder가 비전으로 확장되어, 이미지를 패치 토큰 시
 ![image44.png](./AI_seminar_images_png/image44.png)
 ![image45.png](./AI_seminar_images_png/image45.png)
 
-MAE는 “마스킹 기반 사전학습”을 비전에 맞게 재해석한 방법이다[9].
-
-#### DINO / DINOv2: ViT의 자기지도 표현 학습
-
-ViT 이후 중요한 전개 중 하나는 “라벨 없이도 강한 비전 표현을 만들 수 있는가?”였다. DINO는 teacher-student 구조의 자기증류(self-distillation) 기반 자기지도 학습으로, ViT가 분류 라벨 없이도 의미 있는 특징을 학습할 수 있음을 보여줬다[18]. 이후 DINOv2는 더 큰 데이터/스케일에서 보다 범용적인 비전 백본으로 이어진다[19].
+MAE는 BERT에서 사용되었던 “마스킹 기반 사전학습”을 비전에 맞게 재해석한 방법이다[9].
 
 #### CLIP: 비전-언어 정렬로 “전이 가능한” 비전 모델
 
+![image65.png](./AI_seminar_images_png/image65.png)
+
 CLIP은 이미지와 텍스트를 같은 임베딩 공간에 정렬시키는 대조학습(contrastive learning)으로, 자연어로 정의된 클래스/개념에 대한 zero-shot 전이를 강하게 만들었다[20]. 이후 멀티모달 모델(VLM)과 비전+LLM 결합 흐름의 중요한 출발점이 된다.
+
+![image66.png](./AI_seminar_images_png/image66.png)
+![image67.png](./AI_seminar_images_png/image67.png)
 
 #### Stable Diffusion(=Latent Diffusion): 텍스트-조건부 생성의 대중화
 
 또 다른 큰 축은 “이해”를 넘어 “생성”으로의 확장이다. Latent Diffusion은 고해상도 이미지를 픽셀 공간이 아니라 latent 공간에서 확산모델로 생성함으로써 계산 효율을 높였고, Stable Diffusion은 이를 널리 확산시키며 텍스트→이미지 생성의 대표 흐름을 만들었다[21].
 
+![image68.png](./AI_seminar_images_png/image68.png)
+![image69.png](./AI_seminar_images_png/image69.png)
+
 ---
 
-## Conclusion
-
-### 이후 흐름(비교적 최신): LLM / Vision / Multimodal로 확장
+### 이후 연구 흐름: LLM / Vision / Multimodal로 확장
 
 ViT와 MAE 이후 연구는 크게 세 축으로 빠르게 발전했다. 동시에 “모델을 어떻게 빠르고 싸게 제공(serve)할 것인가”라는 서빙/추론(inference) 축도 LLM 시대의 핵심 흐름으로 자리 잡았다.
 
